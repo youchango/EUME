@@ -74,17 +74,17 @@ function Onboarding2() {
               </div>
 
               {/* 빠른 선택 */}
-              <div className="quick-select">
-                <p className="quick-select-label">또는 선택하세요:</p>
-                <div className="name-options">
-                  <button className="name-option" onClick={() => handleSetName('어르신')}>
-                    어르신
-                  </button>
-                  <button className="name-option" onClick={() => handleSetName('선생님')}>
-                    선생님
-                  </button>
-                </div>
-              </div>
+              {/*<div className="quick-select">*/}
+              {/*  <p className="quick-select-label">또는 선택하세요:</p>*/}
+              {/*  <div className="name-options">*/}
+              {/*    <button className="name-option" onClick={() => handleSetName('어르신')}>*/}
+              {/*      어르신*/}
+              {/*    </button>*/}
+              {/*    <button className="name-option" onClick={() => handleSetName('선생님')}>*/}
+              {/*      선생님*/}
+              {/*    </button>*/}
+              {/*  </div>*/}
+              {/*</div>*/}
             </div>
           </div>
 

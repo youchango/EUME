@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import '../../styles/admin.css';
 import logo from '../../assets/shared/logo.png';
 import lockIcon from '../../assets/admin/icons/lock.svg';
+import { API_ENDPOINTS } from '../../api/config';
+import axiosInstance from '../../api/axios';
 
 function Login() {
   const navigate = useNavigate();
@@ -14,28 +16,6 @@ function Login() {
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-
-  // 테스트용 계정 (실제 환경에서는 백엔드 API 사용)
-  const testAccounts = {
-    'admin': {
-      password: 'admin123',
-      name: '홍길동',
-      organization: 'paju-city',
-      role: '파주시청 복지과'
-    },
-    'manager': {
-      password: 'manager123',
-      name: '김관리',
-      organization: 'welfare-center',
-      role: '파주시 노인복지관'
-    },
-    'worker': {
-      password: 'worker123',
-      name: '이복지',
-      organization: 'social-service',
-      role: '파주시 사회복지과'
-    }
-  };
 
   // 기존 세션 확인
   useEffect(() => {
@@ -75,7 +55,7 @@ function Login() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // 유효성 검사
@@ -97,31 +77,40 @@ function Login() {
     // 로그인 처리
     setIsLoading(true);
 
-    // 로그인 시뮬레이션 (실제 환경에서는 API 호출)
-    setTimeout(() => {
-      const account = testAccounts[formData.username];
+    try {
+      // API 호출 - axios 인스턴스 사용
+      const result = await axiosInstance.post('user/login', {
+        userId: formData.username,
+        userPw: formData.password,
+        loginType: 'admin',
+        organization: formData.organization
+      });
 
-      if (account && account.password === formData.password) {
-        // 로그인 성공
-        const userData = {
-          username: formData.username,
-          name: account.name,
-          organization: formData.organization,
-          role: account.role,
-          loginTime: new Date().toISOString()
-        };
+      // 로그인 성공
+      const userData = {
+        username: formData.username,
+        name: result.user?.userName || formData.username,
+        organization: formData.organization,
+        role: result.user?.role || '관리자',
+        loginTime: new Date().toISOString()
+      };
 
-        // 세션 저장
-        saveSession(userData, formData.rememberMe);
-
-        // 대시보드로 리다이렉트
-        navigate('/admin/dashboard');
-      } else {
-        // 로그인 실패
-        setErrorMessage('아이디 또는 비밀번호가 올바르지 않습니다.');
-        setIsLoading(false);
+      // 토큰 저장
+      if (result.token) {
+        localStorage.setItem('accessToken', result.token);
       }
-    }, 1000);
+
+      // 세션 저장
+      saveSession(userData, formData.rememberMe);
+
+      // 대시보드로 리다이렉트
+      navigate('/admin/dashboard');
+    } catch (error) {
+      console.error('로그인 오류:', error);
+      const errorMessage = error.response?.data?.message || error.message || '아이디 또는 비밀번호가 올바르지 않습니다.';
+      setErrorMessage(errorMessage);
+      setIsLoading(false);
+    }
   };
 
   const saveSession = (userData, rememberMe) => {
@@ -255,7 +244,7 @@ function Login() {
 
         {/* 하단 정보 */}
         <div className="login-footer">
-          <p>© 2025 파주시. All rights reserved.</p>
+          <p>© 2025 해커톤 이음이. All rights reserved.</p>
           <div className="footer-links">
             <a href="#">이용약관</a>
             <span>|</span>

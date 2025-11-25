@@ -5,6 +5,7 @@ import '../../styles/user.css';
 function Onboarding3() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    userId: '',
     email: '',
     userPw: '',
     userPwConfirm: '',
@@ -17,6 +18,7 @@ function Onboarding3() {
 
   useEffect(() => {
     // 기존 저장된 데이터 로드
+    const savedUserId = localStorage.getItem('eume_userId') || '';
     const savedEmail = localStorage.getItem('eume_email') || '';
     const savedUserName = localStorage.getItem('eume_realName') || '';
     const savedBirthDate = localStorage.getItem('eume_birthDate') || '';
@@ -25,6 +27,7 @@ function Onboarding3() {
 
     setFormData((prev) => ({
       ...prev,
+      userId: savedUserId,
       email: savedEmail,
       userName: savedUserName,
       birthDate: savedBirthDate,
@@ -48,11 +51,13 @@ function Onboarding3() {
   const validateForm = () => {
     const newErrors = {};
 
-    // 이메일 검증
-    if (!formData.email.trim()) {
-      newErrors.email = '이메일을 입력해주세요';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = '올바른 이메일 형식이 아닙니다';
+    // 아이디 검증
+    if (!formData.userId.trim()) {
+      newErrors.userId = '아이디를 입력해주세요';
+    } else if (formData.userId.length < 4) {
+      newErrors.userId = '아이디는 4자 이상이어야 합니다';
+    } else if (!/^[a-zA-Z0-9_]+$/.test(formData.userId)) {
+      newErrors.userId = '아이디는 영문, 숫자, 언더스코어만 사용 가능합니다';
     }
 
     // 비밀번호 검증
@@ -70,6 +75,13 @@ function Onboarding3() {
     // 이름 검증
     if (!formData.userName.trim()) {
       newErrors.userName = '이름을 입력해주세요';
+    }
+
+    // 이메일 검증
+    if (!formData.email.trim()) {
+      newErrors.email = '이메일을 입력해주세요';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = '올바른 이메일 형식이 아닙니다';
     }
 
     // 생년월일 검증
@@ -90,12 +102,21 @@ function Onboarding3() {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    // 에러가 있으면 alert 표시
+    if (Object.keys(newErrors).length > 0) {
+      const firstError = Object.values(newErrors)[0];
+      alert(firstError);
+      return false;
+    }
+
+    return true;
   };
 
   const handleNext = () => {
     if (validateForm()) {
       // 데이터 저장
+      localStorage.setItem('eume_userId', formData.userId);
       localStorage.setItem('eume_email', formData.email);
       localStorage.setItem('eume_userPw', formData.userPw);
       localStorage.setItem('eume_realName', formData.userName);
@@ -129,6 +150,7 @@ function Onboarding3() {
 
   const isFormValid = () => {
     return (
+      formData.userId &&
       formData.email &&
       formData.userPw &&
       formData.userPwConfirm &&
@@ -169,17 +191,18 @@ function Onboarding3() {
             </p>
 
             <div className="input-container" style={{ gap: '1.25rem', marginTop: '1.5rem' }}>
-              {/* 이메일 */}
+              {/* 아이디 */}
               <div className="input-group">
-                <label className="input-label">이메일</label>
+                <label className="input-label">아이디</label>
                 <input
-                  type="email"
-                  className={`input input-large ${errors.email ? 'input-error' : ''}`}
-                  placeholder="example@email.com"
-                  value={formData.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
+                  type="text"
+                  className={`input input-large ${errors.userId ? 'input-error' : ''}`}
+                  placeholder="영문, 숫자 4자 이상"
+                  maxLength="20"
+                  value={formData.userId}
+                  onChange={(e) => handleChange('userId', e.target.value)}
                 />
-                {errors.email && <p className="input-error-text">{errors.email}</p>}
+                {errors.userId && <p className="input-error-text">{errors.userId}</p>}
               </div>
 
               {/* 비밀번호 */}
@@ -220,6 +243,19 @@ function Onboarding3() {
                   onChange={(e) => handleChange('userName', e.target.value)}
                 />
                 {errors.userName && <p className="input-error-text">{errors.userName}</p>}
+              </div>
+
+              {/* 이메일 */}
+              <div className="input-group">
+                <label className="input-label">이메일</label>
+                <input
+                  type="email"
+                  className={`input input-large ${errors.email ? 'input-error' : ''}`}
+                  placeholder="example@email.com"
+                  value={formData.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
+                />
+                {errors.email && <p className="input-error-text">{errors.email}</p>}
               </div>
 
               {/* 생년월일 */}
@@ -278,7 +314,6 @@ function Onboarding3() {
             <button
               className="btn btn-primary btn-large btn-full"
               onClick={handleNext}
-              disabled={!isFormValid()}
             >
               다음
             </button>

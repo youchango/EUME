@@ -49,7 +49,8 @@ EUME/
 
 ### 1. 환경 변수 (.env)
 ```bash
-VITE_API_URL=http://localhost:8080/
+#VITE_API_URL=http://localhost:8080/
+VITE_API_URL=https://4.230.16.73:8443/
 VITE_ENV=development
 ```
 

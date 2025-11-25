@@ -55,7 +55,7 @@ function Splash() {
           </div>
 
           <div className="footer-logo">
-            <p className="footer-text">파주시 독거노인 정서 돌봄 서비스</p>
+            <p className="footer-text">해커톤 청년 정서 돌봄 서비스</p>
           </div>
         </div>
       </div>

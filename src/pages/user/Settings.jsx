@@ -335,14 +335,14 @@ function Settings() {
 
   // 문의하기
   const contactSupport = () => {
-    if (window.confirm('파주시 복지센터(031-940-1234)로 전화하시겠습니까?')) {
+    if (window.confirm('청년 복지센터(031-940-1234)로 전화하시겠습니까?')) {
       window.location.href = 'tel:031-940-1234';
     }
   };
 
   // 앱 정보
   const showAppInfo = () => {
-    if (window.confirm('이음이 v1.0.0\n파주시 독거노인 정서 돌봄 서비스\n\n© 2025 파주시\n\n개발: Claude Code')) {
+    if (window.confirm('이음이 v1.0.0\n해커톤 청년 정서 돌봄 서비스\n\n© 2025 해커톤 이음이\n\n개발: Claude Code')) {
       // 확인 버튼 클릭 시 아무 동작 없음
     }
   };

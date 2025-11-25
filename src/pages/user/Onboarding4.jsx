@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/user.css';
+import { API_ENDPOINTS } from '../../api/config';
+import axiosInstance from '../../api/axios';
 
 function Onboarding4() {
   const navigate = useNavigate();
@@ -29,11 +31,53 @@ function Onboarding4() {
     localStorage.setItem('eume_theme', theme);
   };
 
-  const handleComplete = () => {
-    localStorage.setItem('eume_theme', selectedTheme);
-    localStorage.setItem('eume_visited', 'true');
-    localStorage.setItem('eume_onboarding_complete', 'true');
-    navigate('/user/home');
+  const handleComplete = async () => {
+    try {
+      // localStorage에서 모든 데이터 가져오기
+      const userId = localStorage.getItem('eume_userId') || '';
+      const email = localStorage.getItem('eume_email') || '';
+      const userPw = localStorage.getItem('eume_userPw') || '';
+      const userName = localStorage.getItem('eume_realName') || '';
+      const nickname = localStorage.getItem('eume_userName') || '';
+      const birthDate = localStorage.getItem('eume_birthDate') || '';
+      const gender = localStorage.getItem('eume_gender') || '';
+      const phone = localStorage.getItem('eume_phone') || '';
+
+      // API 요청 데이터 구성
+      const registerData = {
+        userId: userId,
+        email: email,
+        userPw: userPw,
+        userName: userName,
+        nickname: nickname,
+        loginType: 'local', // 기본값: 로컬 회원가입
+        providerId: null,
+        groupId: null,
+        birthDate: birthDate,
+        gender: gender,
+        phone: phone,
+        profileImage: null,
+        backgroundTheme: selectedTheme,
+      };
+
+      // API 호출 - axios 인스턴스 사용
+      const result = await axiosInstance.post('user/register', registerData);
+
+      // 회원가입 성공 시 테마 및 상태 저장
+      localStorage.setItem('eume_theme', selectedTheme);
+      localStorage.setItem('eume_visited', 'true');
+      localStorage.setItem('eume_onboarding_complete', 'true');
+
+      // 성공 메시지 표시
+      alert('회원가입이 완료되었습니다!');
+
+      // 홈으로 이동
+      navigate('/user/home');
+    } catch (error) {
+      console.error('회원가입 오류:', error);
+      const errorMessage = error.response?.data?.message || error.message || '회원가입 중 오류가 발생했습니다. 다시 시도해주세요.';
+      alert(errorMessage);
+    }
   };
 
   return (

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../styles/user.css';
-import logo from '../../assets/shared/logo2.png';
+import logo from '../../assets/shared/logo.svg';
+import { API_ENDPOINTS } from '../../api/config';
+import axiosInstance from '../../api/axios';
 
 function Login() {
   const navigate = useNavigate();
@@ -19,7 +21,7 @@ function Login() {
     setError('');
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
     const { username, password } = formData;
@@ -29,15 +31,26 @@ function Login() {
       return;
     }
 
-    // 간단한 로그인 검증 (실제로는 API 호출)
-    // 테스트 계정: test / test123
-    if (username === 'test' && password === 'test123') {
-      localStorage.setItem('eume_user_token', 'demo_token');
-      localStorage.setItem('eume_user', JSON.stringify({ username }));
+    try {
+      // API 호출 - axios 인스턴스 사용
+      const result = await axiosInstance.post('user/login', {
+        userId: username,
+        userPw: password,
+        loginType: 'local'
+      });
+
+      // 로그인 성공 시 토큰 및 사용자 정보 저장
+      if (result.token) {
+        localStorage.setItem('accessToken', result.token);
+      }
+      localStorage.setItem('eume_user', JSON.stringify(result.user || { username }));
       localStorage.setItem('eume_visited', 'true');
+
       navigate('/user/home');
-    } else {
-      setError('아이디 또는 비밀번호가 올바르지 않습니다');
+    } catch (error) {
+      console.error('로그인 오류:', error);
+      const errorMessage = error.response?.data?.message || error.message || '아이디 또는 비밀번호가 올바르지 않습니다';
+      setError(errorMessage);
     }
   };
 
@@ -58,11 +71,11 @@ function Login() {
         <div className="login-container">
           {/* 로고 및 타이틀 */}
           <div className="login-logo-section">
-            <img
-              src={logo}
-              alt="이음이 로고"
-              className="login-logo"
-            />
+            {/*<img*/}
+            {/*  src={logo}*/}
+            {/*  alt="이음이 로고"*/}
+            {/*  className="login-logo"*/}
+            {/*/>*/}
             <h1 className="login-app-title">
               이음이
             </h1>
@@ -163,10 +176,10 @@ function Login() {
           {/* 안내 텍스트 */}
           <div className="login-footer">
             <p className="login-footer-text">
-              파주시 독거노인 정서 돌봄 서비스
+              해커톤 청년 정서 돌봄 서비스
             </p>
             <p className="login-footer-copyright">
-              © 2025 파주시. All rights reserved.
+              © 2025 해커톤 이음이. All rights reserved.
             </p>
           </div>
         </div>
