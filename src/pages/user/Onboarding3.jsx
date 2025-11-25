@@ -4,45 +4,148 @@ import '../../styles/user.css';
 
 function Onboarding3() {
   const navigate = useNavigate();
-  const [selectedTheme, setSelectedTheme] = useState('ocean');
+  const [formData, setFormData] = useState({
+    email: '',
+    userPw: '',
+    userPwConfirm: '',
+    userName: '',
+    birthDate: '',
+    gender: '',
+    phone: '',
+  });
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    // 기존에 저장된 테마 로드
-    const saved = localStorage.getItem('eume_theme');
-    if (saved) {
-      setSelectedTheme(saved);
-    }
+    // 기존 저장된 데이터 로드
+    const savedEmail = localStorage.getItem('eume_email') || '';
+    const savedUserName = localStorage.getItem('eume_realName') || '';
+    const savedBirthDate = localStorage.getItem('eume_birthDate') || '';
+    const savedGender = localStorage.getItem('eume_gender') || '';
+    const savedPhone = localStorage.getItem('eume_phone') || '';
+
+    setFormData((prev) => ({
+      ...prev,
+      email: savedEmail,
+      userName: savedUserName,
+      birthDate: savedBirthDate,
+      gender: savedGender,
+      phone: savedPhone,
+    }));
   }, []);
-
-  // 테마 변경 시 body 클래스 적용
-  useEffect(() => {
-    const body = document.body;
-    body.className = `theme-${selectedTheme}`;
-  }, [selectedTheme]);
 
   const handleBack = () => {
     navigate('/user/onboarding-2');
   };
 
-  const handleThemeChange = (theme) => {
-    setSelectedTheme(theme);
-    localStorage.setItem('eume_theme', theme);
+  const handleChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    // 에러 초기화
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }));
+    }
   };
 
-  const handleComplete = () => {
-    localStorage.setItem('eume_theme', selectedTheme);
-    localStorage.setItem('eume_visited', 'true');
-    localStorage.setItem('eume_onboarding_complete', 'true');
-    navigate('/user/home');
+  const validateForm = () => {
+    const newErrors = {};
+
+    // 이메일 검증
+    if (!formData.email.trim()) {
+      newErrors.email = '이메일을 입력해주세요';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = '올바른 이메일 형식이 아닙니다';
+    }
+
+    // 비밀번호 검증
+    if (!formData.userPw) {
+      newErrors.userPw = '비밀번호를 입력해주세요';
+    } else if (formData.userPw.length < 6) {
+      newErrors.userPw = '비밀번호는 6자 이상이어야 합니다';
+    }
+
+    // 비밀번호 확인
+    if (formData.userPw !== formData.userPwConfirm) {
+      newErrors.userPwConfirm = '비밀번호가 일치하지 않습니다';
+    }
+
+    // 이름 검증
+    if (!formData.userName.trim()) {
+      newErrors.userName = '이름을 입력해주세요';
+    }
+
+    // 생년월일 검증
+    if (!formData.birthDate) {
+      newErrors.birthDate = '생년월일을 입력해주세요';
+    }
+
+    // 성별 검증
+    if (!formData.gender) {
+      newErrors.gender = '성별을 선택해주세요';
+    }
+
+    // 전화번호 검증
+    if (!formData.phone.trim()) {
+      newErrors.phone = '전화번호를 입력해주세요';
+    } else if (!/^[0-9-]+$/.test(formData.phone)) {
+      newErrors.phone = '올바른 전화번호 형식이 아닙니다';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      // 데이터 저장
+      localStorage.setItem('eume_email', formData.email);
+      localStorage.setItem('eume_userPw', formData.userPw);
+      localStorage.setItem('eume_realName', formData.userName);
+      localStorage.setItem('eume_birthDate', formData.birthDate);
+      localStorage.setItem('eume_gender', formData.gender);
+      localStorage.setItem('eume_phone', formData.phone);
+
+      navigate('/user/onboarding-4');
+    }
+  };
+
+  const formatPhoneNumber = (value) => {
+    // 숫자만 추출
+    const numbers = value.replace(/[^0-9]/g, '');
+
+    // 자동으로 하이픈 추가
+    if (numbers.length <= 3) {
+      return numbers;
+    } else if (numbers.length <= 7) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    } else if (numbers.length <= 11) {
+      return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+    }
+    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+  };
+
+  const handlePhoneChange = (value) => {
+    const formatted = formatPhoneNumber(value);
+    handleChange('phone', formatted);
+  };
+
+  const isFormValid = () => {
+    return (
+      formData.email &&
+      formData.userPw &&
+      formData.userPwConfirm &&
+      formData.userName &&
+      formData.birthDate &&
+      formData.gender &&
+      formData.phone
+    );
   };
 
   return (
-    <div className={`theme-${selectedTheme}`}>
+    <div className="theme-ocean">
       <div className="app-container">
         <div className="onboarding-container">
           {/* 뒤로가기 버튼 */}
           <button className="back-button" onClick={handleBack}>
-            ← 이전
+            ←
           </button>
 
           {/* 진행 표시 */}
@@ -50,102 +153,134 @@ function Onboarding3() {
             <span className="progress-dot completed"></span>
             <span className="progress-dot completed"></span>
             <span className="progress-dot active"></span>
+            <span className="progress-dot"></span>
           </div>
 
           {/* 메인 콘텐츠 */}
-          <div className="onboarding-content">
+          <div className="onboarding-content" style={{ paddingTop: '1rem' }}>
             <h1 className="onboarding-title">
-              편한 색을<br />
-              선택해주세요
+              정보를<br />
+              입력해주세요
             </h1>
 
             <p className="onboarding-description">
-              마음에 드는 색상을 골라주세요<br />
-              나중에 변경할 수 있어요
+              안전한 서비스 이용을 위해<br />
+              필요한 정보를 알려주세요
             </p>
 
-            <div className="theme-selector">
-              <label className="theme-option">
+            <div className="input-container" style={{ gap: '1.25rem', marginTop: '1.5rem' }}>
+              {/* 이메일 */}
+              <div className="input-group">
+                <label className="input-label">이메일</label>
                 <input
-                  type="radio"
-                  name="theme"
-                  value="ocean"
-                  checked={selectedTheme === 'ocean'}
-                  onChange={() => handleThemeChange('ocean')}
+                  type="email"
+                  className={`input input-large ${errors.email ? 'input-error' : ''}`}
+                  placeholder="example@email.com"
+                  value={formData.email}
+                  onChange={(e) => handleChange('email', e.target.value)}
                 />
-                <div className="theme-preview ocean">
-                  <span className="theme-color"></span>
-                  <span className="theme-name">바다</span>
-                  <span className="theme-desc">시원한 파랑</span>
-                </div>
-              </label>
+                {errors.email && <p className="input-error-text">{errors.email}</p>}
+              </div>
 
-              <label className="theme-option">
+              {/* 비밀번호 */}
+              <div className="input-group">
+                <label className="input-label">비밀번호</label>
                 <input
-                  type="radio"
-                  name="theme"
-                  value="sunset"
-                  checked={selectedTheme === 'sunset'}
-                  onChange={() => handleThemeChange('sunset')}
+                  type="password"
+                  className={`input input-large ${errors.userPw ? 'input-error' : ''}`}
+                  placeholder="6자 이상 입력"
+                  value={formData.userPw}
+                  onChange={(e) => handleChange('userPw', e.target.value)}
                 />
-                <div className="theme-preview sunset">
-                  <span className="theme-color"></span>
-                  <span className="theme-name">노을</span>
-                  <span className="theme-desc">따뜻한 주황</span>
-                </div>
-              </label>
+                {errors.userPw && <p className="input-error-text">{errors.userPw}</p>}
+              </div>
 
-              <label className="theme-option">
+              {/* 비밀번호 확인 */}
+              <div className="input-group">
+                <label className="input-label">비밀번호 확인</label>
                 <input
-                  type="radio"
-                  name="theme"
-                  value="forest"
-                  checked={selectedTheme === 'forest'}
-                  onChange={() => handleThemeChange('forest')}
+                  type="password"
+                  className={`input input-large ${errors.userPwConfirm ? 'input-error' : ''}`}
+                  placeholder="비밀번호 다시 입력"
+                  value={formData.userPwConfirm}
+                  onChange={(e) => handleChange('userPwConfirm', e.target.value)}
                 />
-                <div className="theme-preview forest">
-                  <span className="theme-color"></span>
-                  <span className="theme-name">숲</span>
-                  <span className="theme-desc">편안한 초록</span>
-                </div>
-              </label>
+                {errors.userPwConfirm && <p className="input-error-text">{errors.userPwConfirm}</p>}
+              </div>
 
-              <label className="theme-option">
+              {/* 이름 */}
+              <div className="input-group">
+                <label className="input-label">이름</label>
                 <input
-                  type="radio"
-                  name="theme"
-                  value="lavender"
-                  checked={selectedTheme === 'lavender'}
-                  onChange={() => handleThemeChange('lavender')}
+                  type="text"
+                  className={`input input-large ${errors.userName ? 'input-error' : ''}`}
+                  placeholder="홍길동"
+                  maxLength="20"
+                  value={formData.userName}
+                  onChange={(e) => handleChange('userName', e.target.value)}
                 />
-                <div className="theme-preview lavender">
-                  <span className="theme-color"></span>
-                  <span className="theme-name">라벤더</span>
-                  <span className="theme-desc">은은한 보라</span>
-                </div>
-              </label>
+                {errors.userName && <p className="input-error-text">{errors.userName}</p>}
+              </div>
 
-              <label className="theme-option">
+              {/* 생년월일 */}
+              <div className="input-group">
+                <label className="input-label">생년월일</label>
                 <input
-                  type="radio"
-                  name="theme"
-                  value="rose"
-                  checked={selectedTheme === 'rose'}
-                  onChange={() => handleThemeChange('rose')}
+                  type="date"
+                  className={`input input-large ${errors.birthDate ? 'input-error' : ''}`}
+                  value={formData.birthDate}
+                  onChange={(e) => handleChange('birthDate', e.target.value)}
+                  max={new Date().toISOString().split('T')[0]}
                 />
-                <div className="theme-preview rose">
-                  <span className="theme-color"></span>
-                  <span className="theme-name">장미</span>
-                  <span className="theme-desc">부드러운 분홍</span>
+                {errors.birthDate && <p className="input-error-text">{errors.birthDate}</p>}
+              </div>
+
+              {/* 성별 */}
+              <div className="input-group">
+                <label className="input-label">성별</label>
+                <div className="gender-options">
+                  <button
+                    type="button"
+                    className={`gender-option ${formData.gender === 'M' ? 'selected' : ''}`}
+                    onClick={() => handleChange('gender', 'M')}
+                  >
+                    남성
+                  </button>
+                  <button
+                    type="button"
+                    className={`gender-option ${formData.gender === 'F' ? 'selected' : ''}`}
+                    onClick={() => handleChange('gender', 'F')}
+                  >
+                    여성
+                  </button>
                 </div>
-              </label>
+                {errors.gender && <p className="input-error-text">{errors.gender}</p>}
+              </div>
+
+              {/* 전화번호 */}
+              <div className="input-group">
+                <label className="input-label">전화번호</label>
+                <input
+                  type="tel"
+                  className={`input input-large ${errors.phone ? 'input-error' : ''}`}
+                  placeholder="010-1234-5678"
+                  maxLength="13"
+                  value={formData.phone}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                />
+                {errors.phone && <p className="input-error-text">{errors.phone}</p>}
+              </div>
             </div>
           </div>
 
           {/* 버튼 영역 */}
           <div className="button-container">
-            <button className="btn btn-primary btn-large btn-full" onClick={handleComplete}>
-              완료
+            <button
+              className="btn btn-primary btn-large btn-full"
+              onClick={handleNext}
+              disabled={!isFormValid()}
+            >
+              다음
             </button>
           </div>
         </div>

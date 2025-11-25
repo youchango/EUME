@@ -6,7 +6,7 @@ function Onboarding1() {
 
   const handleSkip = () => {
     localStorage.setItem('eume_onboarding_complete', 'true');
-    navigate('/user/home');
+    navigate('/user/login');
   };
 
   const handleNext = () => {
@@ -20,6 +20,7 @@ function Onboarding1() {
           {/* 진행 표시 */}
           <div className="progress-dots">
             <span className="progress-dot active"></span>
+            <span className="progress-dot"></span>
             <span className="progress-dot"></span>
             <span className="progress-dot"></span>
           </div>

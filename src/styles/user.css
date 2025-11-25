@@ -5591,3 +5591,102 @@ body.dark-mode {
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+/* ===== 성별 선택 버튼 ===== */
+.gender-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-2);
+}
+
+.gender-option {
+    padding: var(--spacing-4);
+    background: var(--bg-secondary);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    text-align: center;
+}
+
+.gender-option:hover {
+    background: var(--bg-tertiary);
+}
+
+.gender-option.selected {
+    background: var(--primary-500);
+    border-color: var(--primary-600);
+    color: var(--white);
+    transform: scale(1.02);
+}
+
+/* ===== 입력 에러 스타일 ===== */
+.input-error {
+    border-color: var(--error) !important;
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.input-error:focus {
+    outline-color: var(--error) !important;
+}
+
+.input-error-text {
+    display: block;
+    margin-top: var(--spacing-2);
+    color: var(--error);
+    font-size: var(--text-sm);
+    font-weight: var(--font-medium);
+}
+
+/* ===== 입력 레이블 ===== */
+.input-label {
+    display: block;
+    margin-bottom: var(--spacing-2);
+    color: var(--text-primary);
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+}
+
+/* ===== Onboarding 스크롤 개선 (긴 폼용) ===== */
+.onboarding-container:has(.input-container) .onboarding-content {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-right: var(--spacing-2);
+}
+
+.onboarding-container:has(.input-container) .onboarding-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.onboarding-container:has(.input-container) .onboarding-content::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+}
+
+.onboarding-container:has(.input-container) .onboarding-content::-webkit-scrollbar-thumb {
+    background: var(--primary-500);
+    border-radius: 3px;
+}
+
+.onboarding-container:has(.input-container) .onboarding-content::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-600);
+}
+
+/* ===== Onboarding3 입력 폼 레이아웃 조정 ===== */
+.onboarding-container:has(.input-container) .onboarding-content {
+    justify-content: flex-start;
+    padding-top: var(--spacing-4);
+    padding-bottom: var(--spacing-4);
+}
+
+/* input-container 내부 여백 */
+.input-container {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+}

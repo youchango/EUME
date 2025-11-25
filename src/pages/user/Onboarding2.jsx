@@ -36,13 +36,14 @@ function Onboarding2() {
         <div className="onboarding-container">
           {/* 뒤로가기 버튼 */}
           <button className="back-button" onClick={handleBack}>
-            ← 이전
+            ←
           </button>
 
           {/* 진행 표시 */}
           <div className="progress-dots">
             <span className="progress-dot completed"></span>
             <span className="progress-dot active"></span>
+            <span className="progress-dot"></span>
             <span className="progress-dot"></span>
           </div>
 

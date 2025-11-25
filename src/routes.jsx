@@ -17,6 +17,7 @@ import UserLogin from './pages/user/Login';
 import UserOnboarding1 from './pages/user/Onboarding1';
 import UserOnboarding2 from './pages/user/Onboarding2';
 import UserOnboarding3 from './pages/user/Onboarding3';
+import UserOnboarding4 from './pages/user/Onboarding4';
 import UserHome from './pages/user/Home';
 import UserChat from './pages/user/Chat';
 import UserHealth from './pages/user/Health';
@@ -77,6 +78,10 @@ const router = createBrowserRouter([
       {
         path: 'onboarding-3',
         element: <UserOnboarding3 />,
+      },
+      {
+        path: 'onboarding-4',
+        element: <UserOnboarding4 />,
       },
       {
         path: 'home',
